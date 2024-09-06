@@ -5,7 +5,6 @@ import google.generativeai as genai
 # Configure the Gemini API with your API key
 genai.configure(api_key="your-api-key")
 
-
 intents = discord.Intents.all()
 bot = commands.Bot(command_prefix="/", intents=intents)
 
@@ -40,11 +39,11 @@ async def on_ready():
 
 @bot.event
 async def on_message(message):
-    if message.author == bot.user or message.author.bot:
+    # Ignore messages from the bot itself, but translate other bots' messages
+    if message.author == bot.user:
         return
 
     try:
-        # Detect the language of the message using Gemini
         source_lang = detect_language_with_gemini(message.content)
         target_lang = "tr"  # Set target language to Turkish (use lowercase for language codes)
 
@@ -53,7 +52,7 @@ async def on_message(message):
             return
 
         translated_text = translate_with_gemini(message.content, target_lang)
-        if translated_text:  # Only send non-empty translations
+        if translated_text:
             await message.channel.send(f'Translated to Turkish: {translated_text}')
     
     except Exception as e:
